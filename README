@@ -1,0 +1,27 @@
+This is a simple tool for manually maintaining a simple set of web
+pages listing available plots and other "data representations" for a
+scientific collaboration.  It requires the plots to be stored in a
+Doc-DB instance, and creates web pages as a "friendly" index layer.
+This was originally created as a proof-of-concept for providing a
+minimal plot index page for MicroBooNE.
+
+Doc-DB is a separate product.  For information on Doc-DB, see
+http://docdb-v.sourceforge.net/.
+
+This simple software tool has to be run manually when it is desired to
+update the page.  It also requires that the relevant files in the
+Doc-DB "document" follow the following naming convention:
+
+    (plotname1).(ext1)
+    (plotname1)_caption.txt
+    (plotname2).(ext2)
+    (plotname2)_caption.tex
+    (plotname3).(ext3a)
+    (plotname3).(ext3b)
+    (plotname3)_caption.txt
+    (other files without captions -- ignored)
+
+Any file without a ``_caption.txt`` or ``_caption.tex`` caption file
+will be ignored by the tool and not included on the generated web page.
+
+ - G. Horton-Smith, 2014/05/23
