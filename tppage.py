@@ -149,7 +149,7 @@ class TPP:
                 # warning: next line assumes CAP_END_TXT and CAP_END_TEX same length
                 prefix = cap[:-len(CAP_END_TXT)]
                 fout.write("<div><h3>%s</h3><br/>\n" % prefix)
-                fnlist = list( fn for fn in filenames if fn.startswith(prefix) )
+                fnlist = list( fn for fn in filenames if fn.startswith(prefix+".") or fn.startswith(prefix+"_caption.") )
                 fnlist.sort()
                 for fn in fnlist:
                     if fn.endswith(THUMB_END):
