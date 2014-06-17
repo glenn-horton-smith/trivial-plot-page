@@ -53,12 +53,24 @@ HTML_HEADER = """<html>
 media="screen, projection"/>
 <style>
 div.FLOATBOX { border: double #7700bb; margin: 1pt; padding: 2pt; float: left; }
+#plotpagefooter { width: 100%%; position:fixed; bottom:0; left:0;
+                  background: #fed; padding-top: 2pt; }
 </style>
 </head>
 <body>
 <h1>Index of %(status)s plots and other data representations</h1>
 """
 
+HTML_FOOTER = """<br/>
+ <div id="plotpagefooter">
+ Questions?  Click on the document numbers for notes and authors,
+ or <a href="../plot_contacts.html">contact us</a>.
+ <span style="float:right">Page last updated: %s </span>
+ </div>
+</body>
+</html>
+"""
+ 
 ################################################################
 # Utility functions
 ################################################################
@@ -168,7 +180,8 @@ class TPP:
                 caption = file(dirpath + "/" + cap).read()
                 fout.write('<br clear="all"/><p>%s</p>\n' % caption)
                 fout.write("</div>\n")
-        fout.write("<hr/><p>Page last updated: %s\n" % time.ctime())
+        fout.write("<hr/>\n")
+        fout.write( HTML_FOOTER % time.ctime())
         fout.write("</body>\n</html>\n")
         fout.close()
                         
