@@ -30,6 +30,7 @@ import zipfile
 import os
 import time
 import urllib
+import re
 
 ################################################################
 # Some constants
@@ -155,8 +156,11 @@ class TPP:
                 header2 = reldir[:reldir.find('/')]
             else:
                 header2 = reldir
-            fout.write('<hr/><a href="%s"><h2>%s</h2></a>\n' % (
-                DOCDB_SHOW_DOC_TEMPLATE % header2, header2))
+            docinfo = self.getDocInfo(header2)
+            fout.write('<hr/><a href="%s"><h2>%s &nbsp; (#%s)</h2></a>\n' % (
+                DOCDB_SHOW_DOC_TEMPLATE % header2, docinfo['title'], header2) )
+            # uncomment line below to show authors
+            # fout.write('<ul>%s</ul>\n' % docinfo['authors'])
             captionfns.sort()
             for cap in captionfns:
                 # warning: next line assumes CAP_END_TXT and CAP_END_TEX same length
@@ -209,6 +213,26 @@ class TPP:
         print "Retrieved document %s to temporary file %s" % (docno, filename)
         return zipfile.ZipFile( filename )
 
+    def getDocInfo(self, docno):
+        """Get the document info from Doc-DB."""
+        url = DOCDB_SHOW_DOC_TEMPLATE % docno
+        info = {}
+        data = urllib.urlopen(url).read()
+        m = re.search('<div[^>]*id *= *"DocTitle"[^>]*>.*<h1>([^<]*)</h1>',
+                      data, re.S)
+        if m:
+            info['title'] = m.groups()[0]
+        else:
+            info['title'] = ""
+            print "No title found for %s" % docno
+        m = re.search('<div[^>]*id *= *"Authors"[^>]*>.*<ul>(.*)</ul>',
+                      data, re.S)
+        if m:
+            info['authors'] = m.groups()[0]
+        else:
+            info['authors'] = ''
+            print "No authors found for %s" % docno
+        return info
 
 
 ################################################################
