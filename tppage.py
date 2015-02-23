@@ -41,7 +41,7 @@ CAP_END_TEX = '_caption.tex'
 
 THUMB_END = "_thumb.png"
 
-IMAGE_EXT_LIST = ['png', 'gif', 'jpeg', 'jpg', 'eps', 'pdf']
+IMAGE_EXT_LIST = ['pdf', 'eps', 'jpeg', 'jpg', 'png', 'gif']
 
 DOCDB_SHOW_DOC_TEMPLATE = 'http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=%s'
 
@@ -52,7 +52,8 @@ HTML_HEADER = """<html>
 <link rel="StyleSheet" href="ubplot.css" type="text/css"  
 media="screen, projection"/>
 <style>
-div.FLOATBOX { border: double #7700bb; margin: 1pt; padding: 2pt; float: left; }
+div.FLOATBOX { border: thin solid #b37013; box-shadow: 2pt 2pt 2pt #f4cd98; 
+               margin: 4pt; padding: 2pt; float: left; }
 #plotpagefooter { width: 100%%; position:fixed; bottom:0; left:0;
                   background: #fed; padding-top: 2pt; }
 </style>
@@ -161,21 +162,29 @@ class TPP:
                 # warning: next line assumes CAP_END_TXT and CAP_END_TEX same length
                 prefix = cap[:-len(CAP_END_TXT)]
                 fout.write("<div><h3>%s</h3><br/>\n" % prefix)
-                fnlist = list( fn for fn in filenames if fn.startswith(prefix+".") or fn.startswith(prefix+"_caption.") )
+                fnlist = list( fn for fn in filenames if (
+                        fn.startswith(prefix+".") 
+                        or fn.startswith(prefix+"_caption.") )
+                               and not fn.endswith(THUMB_END) )
                 fnlist.sort()
+                # find a good image for making a thumbnail image
+                thumbfn = None
+                for ext in IMAGE_EXT_LIST:
+                    thumbfn = prefix + "." + ext
+                    if thumbfn in fnlist:
+                        break
+                    else:
+                        thumbfn = None
+                # make the thumbnail
+                if thumbfn != None:
+                    thumb_fn = self.make_thumb( dirpath+"/"+thumbfn )
+                    fout.write('<div class="FLOATBOX"><img src="%s"/></div>\n' %
+                               thumb_fn[len(status)+1:] )
                 for fn in fnlist:
                     if fn.endswith(THUMB_END):
                         continue
-                    ext = fn[fn.rindex('.')+1:]
-                    # if it's an image file, make a thumbnail for the link,
-                    # otherwise, just make a link
-                    fout.write('<a href="%s">' % (reldir+"/"+fn) )
-                    if ext.lower() in IMAGE_EXT_LIST:
-                        thumb_fn = self.make_thumb( dirpath+"/"+fn )
-                        fout.write('<div class="FLOATBOX"><img src="%s"/><br/>%s</div></a> \n' %
-                                   (thumb_fn[len(status)+1:], fn) )
-                    else:
-                        fout.write('%s</a> \n' % fn )
+                    fout.write('<a href="%s">%s</a><br/>\n' % 
+                               (reldir+"/"+fn, fn) )
                 # now the caption
                 caption = file(dirpath + "/" + cap).read()
                 fout.write('<br clear="all"/><p>%s</p>\n' % caption)
@@ -189,7 +198,7 @@ class TPP:
     def make_thumb(self, fn):
         """Make a thumbnail.  Requires imagemagick's convert utiltity."""
         thumbfn = fn + THUMB_END
-        os.system("convert -resize 128x128 %s %s" % (fn, thumbfn))
+        os.system("convert -trim +repage -resize 400 %s %s" % (fn, thumbfn))
         return thumbfn
 
 
