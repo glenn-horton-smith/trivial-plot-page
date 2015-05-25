@@ -46,6 +46,8 @@ IMAGE_EXT_LIST = ['pdf', 'eps', 'jpeg', 'jpg', 'png', 'gif']
 
 DOCDB_SHOW_DOC_TEMPLATE = 'http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=%s'
 
+DOCDB_SHOW_PUBLIC_DOC_TEMPLATE = 'http://microboone-docdb.fnal.gov/cgi-bin/ShowDocument?docid=%s'
+
 DOCDB_GET_ZIP_TEMPLATE = 'http://microboone-docdb.fnal.gov:8080/cgi-bin/RetrieveArchive?docid=%s&type=zip'
 
 HTML_HEADER = """<html>
@@ -139,6 +141,10 @@ class TPP:
         Relies on python's "walk" function -- see help(os.walk).
         """
         status = status.strip().strip('/')
+        if status.startswith("public"):
+            show_doc_template = DOCDB_SHOW_PUBLIC_DOC_TEMPLATE
+        else:
+            show_doc_template = DOCDB_SHOW_DOC_TEMPLATE
         fout = file("%s/index.html" % status, "w")
         fout.write( HTML_HEADER % { 'status' : status } )
         dirwalk_list = list( os.walk(status) )
@@ -158,7 +164,7 @@ class TPP:
                 header2 = reldir
             docinfo = self.getDocInfo(header2)
             fout.write('<hr/><a href="%s"><h2>%s &nbsp; (#%s)</h2></a>\n' % (
-                DOCDB_SHOW_DOC_TEMPLATE % header2, docinfo['title'], header2) )
+                show_doc_template % header2, docinfo['title'], header2) )
             # uncomment line below to show authors
             # fout.write('<ul>%s</ul>\n' % docinfo['authors'])
             captionfns.sort()
