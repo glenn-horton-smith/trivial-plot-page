@@ -208,7 +208,7 @@ class TPP:
     def make_thumb(self, fn):
         """Make a thumbnail.  Requires imagemagick's convert utiltity."""
         thumbfn = fn + THUMB_END
-        os.system("convert -trim +repage -resize 400 %s %s" % (fn, thumbfn))
+        os.system("convert -trim +repage -resize 400 '%s' '%s'" % (fn, thumbfn))
         return thumbfn
 
 
